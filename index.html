@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <style type="text/css">
-      #mapid_main { height: 300px; margin-top:2px; width: 100%}  /* マップのウィンドウサイズを指定 */
+      #mapid_main { height: 500px; margin-top:2px; width: 100%}  /* マップのウィンドウサイズを指定 */
       .resizeimage img{
         margin-top: 13px;
         width:100%;
@@ -204,13 +204,13 @@
               var curpoint = [Curlat, Curlng]; 
               easymap.setView(curpoint);
           }).addTo(mymap);
-
           //現在地の取得が成功した場合に、その後の処理を行う関数onLocationFoundの呼び出し
           mymap.on('locationfound', onLocationFound);
           //現在地の取得が失敗した場合に、その後の処理を行う関数onLocationErrorの呼び出し
           mymap.on('locationerror', onLocationError);
     
           mymap.locate({setView: true, maxZoom: 18, timeout: 20000});
+
           //マーカー表示用の関数（マーカーがクリックされたときに、新しいページに遷移
           //現在地の取得に成功した場合の処理の関数
           function onLocationFound(e) {
@@ -222,7 +222,9 @@
               L.marker(e.latlng).addTo(mymap)
                 //.bindPopup("現在地: " + lat + ", " + lng + " (誤差: " + accuracy + "m)")
                 //.openPopup();
-          }
+              //地図の表示範囲を設定する（スポットと現在位置のマーカーがすべて表示される）関数の呼び出し
+              MapDisplayBound();
+              }
           //現在地の取得に失敗した場合の処理の関数
           function onLocationError(e) {
               alert("現在地を取得できませんでした。" + e.message);
@@ -240,7 +242,27 @@
               //.openPopup(); 
               }
           }
-
+          //地図の表示範囲を設定する（スポットと現在位置のマーカーがすべて表示される）
+          function MapDisplayBound(){
+              //マーカの座標の最小値・最大値をサーチ
+              let lat_min=1000;
+              let lat_max=-1000;
+              let lng_min=1000;
+              let lng_max=-1000;
+              for(i=0;i<markerList.length;i++){
+                if(markerList[i][3]<lat_min){lat_min=markerList[i][3]};
+                if(markerList[i][3]>lat_max){lat_max=markerList[i][3]};
+                if(markerList[i][4]<lng_min){lng_min=markerList[i][4]};
+                if(markerList[i][4]>lng_max){lng_max=markerList[i][4]};
+              }
+              if(Curlat<lat_min){lat_min=Curlat};
+              if(Curlat>lat_max){lat_max=Curlat};
+              if(Curlng<lng_min){lng_min=Curlng};
+              if(Curlng>lng_max){lng_max=Curlng};
+              const bounds = L.latLngBounds([lat_min,lng_min],[lat_max+0.001,lng_max+0.001]);
+              // 地図をBoundsにフィットさせる
+              mymap.fitBounds(bounds);
+          }
 
  </script>
   </body>

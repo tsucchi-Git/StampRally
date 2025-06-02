@@ -7,7 +7,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <link rel='stylesheet' href='css/menu.css'/>
   <style type="text/css">
-    #mapid_site { height: 300px; width: 100%;margin-top:10px}  /* マップのウィンドウサイズを指定 */
+    #mapid_site { height: 500px; width: 100%;margin-top:10px}  /* マップのウィンドウサイズを指定 */
     #markerImage {height:200px; width: 100%}  
     #GetStamp{width:100px; text-align:center}
   </style>
@@ -127,7 +127,7 @@
           //関数spot_checkinの呼び出し
           spot_checkin(array,visit_yn);
           //地図の表示（関数spot_mapの呼び出し）
-          spot_map(latitude,longitude,visit_yn);
+          spot_map(latitude,longitude,curlatitude,curlongitude);
        }
       else{
         alert('ローカルストレージは使えません');
@@ -234,13 +234,15 @@
             //詳細のページに遷移
             window.location.href ='detail.html'
         }        
-      function spot_map(latitude,longitude){
+      function spot_map(latitude,longitude,curlatitude,curlongitude){
           //地図関係
             //地図の表示
             L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png', {
                   attribution: "<a href='https://maps.gsi.go.jp/development/ichiran.html' target='_blank'>地理院タイル</a>"
               }).addTo(mymap);
-            mymap.locate({setView: true, maxZoom: 16, timeout: 20000}); 
+            mymap.locate({setView: false, maxZoom: 16, timeout: 20000}); 
+            //地図の表示範囲を設定する（スポットと現在位置のマーカーがすべて表示される）関数の呼び出し
+            MapDisplayBoundCheckin(latitude,longitude,curlatitude,curlongitude);            
             //マップにスポットのマーカーをつける
             L.marker([latitude,longitude],{icon : greenIcon}).addTo(mymap)
             //前のページからパラメータとして渡された位置に現在地のマーカーを付ける
@@ -250,6 +252,8 @@
             if(flag_checkin<0){
               //現在位置の連続監視
               var watch_id = navigator.geolocation.watchPosition(successCallback);//,errorCallback,position_options);  
+              //現在位置の連続監視の間隔(ms)を第2引数で指定する
+              setInterval(callBack, 5000);
             }else{
               //
               var dist=document.getElementById("markerDistance");
@@ -263,6 +267,7 @@
             var Curlat=Number(position.coords.latitude);
             var Curlng=Number(position.coords.longitude);
             var r=distance(longitude, latitude,Curlng,Curlat);  //現在地から対象地点までの距離(m)
+            alert(Curlat + ',' + Cullng);
             //現在地を表すマーカーの痕跡をなくして、最新の位置を地図に表示する。
             if (curMarker) {
                   mymap.removeLayer(curMarker);
@@ -328,6 +333,23 @@
           x2 *= RR;
           return 6371 * Math.acos(Math.cos(y1) * Math.cos(y2) * Math.cos(x2 - x1) + Math.sin(y1) * Math.sin(y2))*1000;
         }
+          //地図の表示範囲を設定する（スポットと現在位置のマーカーがすべて表示される）
+          function MapDisplayBoundCheckin(lat1,lng1,lat2,lng2){
+              //マーカの座標の最小値・最大値をサーチ
+              //alert(lat1 + ',' + lng1 + ',' + lat2 + ',' +lng2);
+              let lat_min=1000;
+              let lat_max=-1000;
+              let lng_min=1000;
+              let lng_max=-1000;
+              if(lat1<lat_min){lat_min=lat1};if(lat2<lat_min){lat_min=lat2};
+              if(lat1>lat_max){lat_max=lat1};if(lat2>lat_max){lat_max=lat2};
+              if(lng1<lng_min){lng_min=lng1};if(lng2<lng_min){lng_min=lng2};
+              if(lng1>lng_max){lng_max=lng1};if(lng2>lng_max){lng_max=lng2};
+              const bounds = L.latLngBounds([lat_min,lng_min],[lat_max,lng_max]);
+              // 地図をBoundsにフィットさせる
+              mymap.fitBounds(bounds);
+          }
+
  </script>
 </body>
 </html>
