@@ -7,7 +7,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <link rel='stylesheet' href='css/menu.css'/>
   <style type="text/css">
-    #mapid_site { height: 500px; width: 100%;margin-top:10px}  /* マップのウィンドウサイズを指定 */
+    #mapid_site { height: 400px; width: 100%;margin-top:10px}  /* マップのウィンドウサイズを指定 */
     #markerImage {height:200px; width: 100%}  
     #GetStamp{width:100px; text-align:center}
   </style>
@@ -252,8 +252,6 @@
             if(flag_checkin<0){
               //現在位置の連続監視
               var watch_id = navigator.geolocation.watchPosition(successCallback);//,errorCallback,position_options);  
-              //現在位置の連続監視の間隔(ms)を第2引数で指定する
-              setInterval(callBack, 5000);
             }else{
               //
               var dist=document.getElementById("markerDistance");
@@ -267,7 +265,6 @@
             var Curlat=Number(position.coords.latitude);
             var Curlng=Number(position.coords.longitude);
             var r=distance(longitude, latitude,Curlng,Curlat);  //現在地から対象地点までの距離(m)
-            alert(Curlat + ',' + Cullng);
             //現在地を表すマーカーの痕跡をなくして、最新の位置を地図に表示する。
             if (curMarker) {
                   mymap.removeLayer(curMarker);
