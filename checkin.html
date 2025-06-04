@@ -123,7 +123,7 @@
           //ローカルストレージからキー「vsit_data」で基礎データを読み込み配列visit_ynに格納
           let json_visit=localStorage.getItem('visit_data');
           visit_yn=JSON.parse(json_visit); //[-1,-1,-1,-1,-1,-1]
-          //関数spot_checkinの呼び出し
+          //マーカーの内容を取得（関数spot_checkinの呼び出し）
           spot_checkin(array,visit_yn);
           //地図の表示（関数spot_mapの呼び出し）
           spot_map(latitude,longitude,curlatitude,curlongitude);
@@ -264,6 +264,13 @@
             var Curlat=Number(position.coords.latitude);
             var Curlng=Number(position.coords.longitude);
             var r=distance(longitude, latitude,Curlng,Curlat);  //現在地から対象地点までの距離(m)
+            //現在位置の移動に伴って地図をスライドさせる
+            if(Curlng>=lng_max){lng_max =Number(lng_max)+0.01;lng_min =Number(lng_min)+0.01;const bounds = L.latLngBounds([lat_min,lng_min],[lat_max,lng_max]);mymap.fitBounds(bounds)};
+            if(Curlng<lng_min){lng_min =Number(lng_min)-0.01;lng_max=Number(lng_max)-0.01;const bounds = L.latLngBounds([lat_min,lng_min],[lat_max,lng_max]);mymap.fitBounds(bounds)};
+            if(Curlat>=lat_max){lat_max =Number(lat_max)+0.01;lat_min =Number(lat_min)+0.01;const bounds = L.latLngBounds([lat_min,lng_min],[lat_max,lng_max]);mymap.fitBounds(bounds)};
+            if(Curlat<lat_min){lat_min =Number(lat_min)-0.01;lat_max =Number(lat_max)-0.01;const bounds = L.latLngBounds([lat_min,lng_min],[lat_max,lng_max]);mymap.fitBounds(bounds)};             
+
+
             //現在地を表すマーカーの痕跡をなくして、最新の位置を地図に表示する。
             if (curMarker) {
                   mymap.removeLayer(curMarker);
